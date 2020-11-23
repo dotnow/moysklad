@@ -1,3 +1,3 @@
-module github.com/credo4me/moysklad
+module github.com/yrle/moysklad
 
 go 1.15
