@@ -37,16 +37,22 @@ type CounterParty struct {
 	} `json:"files,omitempty"` // Массив метаданных Файлов (Максимальное количество файлов - 100)
 }
 
-// CounterpartyRequest структура для запросов сущности 'counterparty'
-type CounterpartyRequest struct{ *APIRequest }
+// CounterpartyClient структура для запросов сущности 'counterparty'
+type CounterpartyClient struct{ *Client }
 
 // Counterparty устанавливает нужный endpoint
-func (client *APIClient) Counterparty(params Params) *CounterpartyRequest {
-	return &CounterpartyRequest{newRequest(client, "entity/counterparty", params)}
+func (api *APIClient) Counterparty(params Params) *CounterpartyClient {
+	return &CounterpartyClient{
+		&Client{
+			endPoint: "entity/counterparty",
+			params:   params,
+			api:      api,
+		},
+	}
 }
 
-// GetByUUID возвращает сущность по UUID
-func (client *CounterpartyRequest) GetByUUID(uuid string) (counterparty *CounterParty, err error) {
+// Get возвращает сущность по UUID
+func (client *CounterpartyClient) Get(uuid string) (counterparty *CounterParty, err error) {
 
 	response, err := client.getByUUID(uuid)
 
@@ -58,10 +64,10 @@ func (client *CounterpartyRequest) GetByUUID(uuid string) (counterparty *Counter
 	return counterparty, nil
 }
 
-// Get возвращает список сущностей
-func (client *CounterpartyRequest) Get() (counterparties []CounterParty, err error) {
+// All возвращает список сущностей
+func (client *CounterpartyClient) All() (counterparties []CounterParty, err error) {
 
-	response, err := client.getList()
+	response, err := client.all()
 	if err != nil {
 		return nil, err
 	}

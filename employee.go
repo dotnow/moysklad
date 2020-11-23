@@ -31,16 +31,22 @@ type Employee struct {
 	Position     string      `json:"position,omitempty"`     // Должность сотрудника
 }
 
-// EmployeeRequest структура для запросов сущности 'employee'
-type EmployeeRequest struct{ *APIRequest }
+// EmployeeClient структура для запросов сущности 'employee'
+type EmployeeClient struct{ *Client }
 
 // Employee устанавливает нужный endpoint
-func (client *APIClient) Employee(params Params) *EmployeeRequest {
-	return &EmployeeRequest{newRequest(client, "entity/employee", params)}
+func (api *APIClient) Employee(params Params) *EmployeeClient {
+	return &EmployeeClient{
+		&Client{
+			endPoint: "entity/employee",
+			params:   params,
+			api:      api,
+		},
+	}
 }
 
 // GetByUUID возвращает сущность по UUID
-func (client *EmployeeRequest) GetByUUID(uuid string) (employee *Employee, err error) {
+func (client *EmployeeClient) GetByUUID(uuid string) (employee *Employee, err error) {
 
 	response, err := client.getByUUID(uuid)
 	if err != nil {
@@ -56,9 +62,9 @@ func (client *EmployeeRequest) GetByUUID(uuid string) (employee *Employee, err e
 }
 
 // Get возвращает список сущностей
-func (client *EmployeeRequest) Get() (employees []Employee, err error) {
+func (client *EmployeeClient) Get() (employees []Employee, err error) {
 
-	response, err := client.getList()
+	response, err := client.all()
 	if err != nil {
 		return nil, err
 	}

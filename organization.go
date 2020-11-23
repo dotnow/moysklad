@@ -71,16 +71,22 @@ type Account struct {
 	Agent                *Organization `json:"agent,omitempty"`                // Метаданные юрлица
 }
 
-// OrganizationRequest структура для запросов сущности 'employee'
-type OrganizationRequest struct{ *APIRequest }
+// OrganizationClient структура для запросов сущности 'employee'
+type OrganizationClient struct{ *Client }
 
 // Organization устанавливает нужный endpoint
-func (client *APIClient) Organization(params Params) *OrganizationRequest {
-	return &OrganizationRequest{newRequest(client, "entity/organization", params)}
+func (api *APIClient) Organization(params Params) *OrganizationClient {
+	return &OrganizationClient{
+		&Client{
+			endPoint: "entity/organization",
+			params:   params,
+			api:      api,
+		},
+	}
 }
 
 // GetByUUID возвращает сущность по UUID
-func (client *OrganizationRequest) GetByUUID(uuid string) (organization *Organization, err error) {
+func (client *OrganizationClient) GetByUUID(uuid string) (organization *Organization, err error) {
 
 	response, err := client.getByUUID(uuid)
 	if err != nil {
@@ -96,9 +102,9 @@ func (client *OrganizationRequest) GetByUUID(uuid string) (organization *Organiz
 }
 
 // Get возвращает список сущностей
-func (client *OrganizationRequest) Get() (organizations []Organization, err error) {
+func (client *OrganizationClient) Get() (organizations []Organization, err error) {
 
-	response, err := client.getList()
+	response, err := client.all()
 	if err != nil {
 		return nil, err
 	}

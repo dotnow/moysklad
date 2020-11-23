@@ -149,16 +149,22 @@ type ProductEntity struct {
 	} `json:"files,omitempty"` // Массив метаданных Файлов (Максимальное количество файлов - 100)
 }
 
-// ProductRequest структура для запросов сущности 'product'
-type ProductRequest struct{ *APIRequest }
+// ProductClient структура для запросов сущности 'product'
+type ProductClient struct{ *Client }
 
 // Product устанавливает нужный endpoint
-func (client *APIClient) Product(params Params) *ProductRequest {
-	return &ProductRequest{newRequest(client, "entity/product", params)}
+func (api *APIClient) Product(params Params) *ProductClient {
+	return &ProductClient{
+		&Client{
+			endPoint: "entity/product",
+			params:   params,
+			api:      api,
+		},
+	}
 }
 
 // GetByUUID возвращает сущность по UUID
-func (client *ProductRequest) GetByUUID(uuid string) (product *ProductEntity, err error) {
+func (client *ProductClient) GetByUUID(uuid string) (product *ProductEntity, err error) {
 
 	response, err := client.getByUUID(uuid)
 	if err != nil {
@@ -174,9 +180,9 @@ func (client *ProductRequest) GetByUUID(uuid string) (product *ProductEntity, er
 }
 
 // Get возвращает список сущностей
-func (client *ProductRequest) Get() (products []ProductEntity, err error) {
+func (client *ProductClient) Get() (products []ProductEntity, err error) {
 
-	response, err := client.getList()
+	response, err := client.all()
 	if err != nil {
 		return nil, err
 	}

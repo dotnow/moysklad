@@ -138,16 +138,23 @@ type RetailStore struct {
 	MasterRetailStores []*RetailStore `json:"masterRetailStores,omitempty"` // Ссылка на точки продаж, которые могут фискализировать операции с текущей точки продаж, если minionToMaster = CHOSEN
 }
 
-// RetailstoreRequest структура для запросов сущности 'retailstore'
-type RetailstoreRequest struct{ *APIRequest }
+// RetailstoreClient структура для запросов сущности 'retailstore'
+type RetailstoreClient struct{ *Client }
 
 // Retailstore устанавливает нужный endpoint
-func (client *APIClient) Retailstore(params Params) *RetailstoreRequest {
-	return &RetailstoreRequest{newRequest(client, "entity/retailstore", params)}
+func (api *APIClient) Retailstore(params Params) *RetailstoreClient {
+	return &RetailstoreClient{
+		&Client{
+
+			endPoint: "entity/retailstore",
+			params:   params,
+			api:      api,
+		},
+	}
 }
 
 // GetByUUID возвращает сущность по UUID
-func (client *RetailstoreRequest) GetByUUID(uuid string) (retailstore *RetailStore, err error) {
+func (client *RetailstoreClient) GetByUUID(uuid string) (retailstore *RetailStore, err error) {
 
 	response, err := client.getByUUID(uuid)
 	if err != nil {
@@ -163,9 +170,9 @@ func (client *RetailstoreRequest) GetByUUID(uuid string) (retailstore *RetailSto
 }
 
 // Get возвращает список сущностей
-func (client *RetailstoreRequest) Get() (retailstores []RetailStore, err error) {
+func (client *RetailstoreClient) Get() (retailstores []RetailStore, err error) {
 
-	response, err := client.getList()
+	response, err := client.all()
 	if err != nil {
 		return nil, err
 	}

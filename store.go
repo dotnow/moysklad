@@ -23,16 +23,23 @@ type Store struct {
 	Attributes   []Attribute  `json:"attributes,omitempty"`   // Массив метаданных дополнительных полей склада
 }
 
-// StoreRequest структура для запросов сущности 'retailstore'
-type StoreRequest struct{ *APIRequest }
+// StoreClient структура для запросов сущности 'retailstore'
+type StoreClient struct{ *Client }
 
 // Store устанавливает нужный endpoint
-func (client *APIClient) Store(params Params) *StoreRequest {
-	return &StoreRequest{newRequest(client, "entity/store", params)}
+func (api *APIClient) Store(params Params) *StoreClient {
+	return &StoreClient{
+		&Client{
+
+			endPoint: "entity/store",
+			params:   params,
+			api:      api,
+		},
+	}
 }
 
 // GetByUUID возвращает сущность по UUID
-func (client *StoreRequest) GetByUUID(uuid string) (store *Store, err error) {
+func (client *StoreClient) GetByUUID(uuid string) (store *Store, err error) {
 
 	response, err := client.getByUUID(uuid)
 	if err != nil {
@@ -48,9 +55,9 @@ func (client *StoreRequest) GetByUUID(uuid string) (store *Store, err error) {
 }
 
 // Get возвращает список сущностей
-func (client *StoreRequest) Get() (stores []Store, err error) {
+func (client *StoreClient) Get() (stores []Store, err error) {
 
-	response, err := client.getList()
+	response, err := client.all()
 	if err != nil {
 		return nil, err
 	}

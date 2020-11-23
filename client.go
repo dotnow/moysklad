@@ -37,11 +37,11 @@ type APIClient struct {
 	httpClient      *http.Client
 }
 
-// APIRequest структура параметров запроса
-type APIRequest struct {
+// Client структура параметров запроса
+type Client struct {
 	endPoint string
 	params   Params
-	client   *APIClient
+	api      *APIClient
 }
 
 // Params структура параметров
@@ -57,8 +57,8 @@ type Filter struct {
 	Operator string
 }
 
-func (request *APIRequest) makeURL(uuid ...string) string {
-	baseURL := fmt.Sprintf("%s%s", APIPath, request.endPoint)
+func (client *Client) makeURL(uuid ...string) string {
+	baseURL := fmt.Sprintf("%s%s", APIPath, client.endPoint)
 
 	if len(uuid) > 0 {
 		baseURL = fmt.Sprintf("%s/%s", baseURL, uuid[0])
@@ -71,11 +71,11 @@ func (request *APIRequest) makeURL(uuid ...string) string {
 
 	query := url.Query()
 
-	if filter := request.params.getFilterString(); filter != "" {
+	if filter := client.params.getFilterString(); filter != "" {
 		query.Set("filter", filter)
 	}
 
-	for key, value := range request.params.Query {
+	for key, value := range client.params.Query {
 		query.Set(key, value)
 	}
 
@@ -84,11 +84,11 @@ func (request *APIRequest) makeURL(uuid ...string) string {
 }
 
 // newRequest создаёт и возвращает ссылку на структуру запроса
-func newRequest(client *APIClient, endPoint string, params Params) *APIRequest {
-	return &APIRequest{
+func newRequest(api *APIClient, endPoint string, params Params) *Client {
+	return &Client{
 		endPoint: endPoint,
 		params:   params,
-		client:   client,
+		api:      api,
 	}
 }
 
@@ -109,13 +109,13 @@ func NewClient(token string) *APIClient {
 }
 
 // getToken возвращает токен доступа
-func (client *APIClient) getToken() string {
-	return fmt.Sprintf(`Bearer %s`, client.token)
+func (api *APIClient) getToken() string {
+	return fmt.Sprintf(`Bearer %s`, api.token)
 }
 
 // setHeaders устанавливает необходимые заголовки к запросу
-func (client *APIClient) setHeaders(req *http.Request) {
-	req.Header.Set(`Authorization`, client.getToken())
+func (api *APIClient) setHeaders(req *http.Request) {
+	req.Header.Set(`Authorization`, api.getToken())
 	req.Header.Set(`Accept`, `application/json;charset=utf-8`)
 	req.Header.Set(`Content-Type`, `application/json`)
 }
@@ -174,9 +174,9 @@ func (params *Params) AddQuery(key string, value string) {
 }
 
 // getByUUID возвращает объект по его UUID
-func (request *APIRequest) getByUUID(uuid string) (result []byte, err error) {
-	url := request.makeURL(uuid)
-	result, err = request.getRequest(url)
+func (client *Client) getByUUID(uuid string) (result []byte, err error) {
+	url := client.makeURL(uuid)
+	result, err = client.getRequest(url)
 	if err != nil {
 		return nil, err
 	}
@@ -185,13 +185,11 @@ func (request *APIRequest) getByUUID(uuid string) (result []byte, err error) {
 }
 
 // getList возвращает множество объектов
-func (request *APIRequest) getList() (data []byte, err error) {
+func (client *Client) all() (data []byte, err error) {
 
-	var limit int
+	url := client.makeURL()
 
-	url := request.makeURL()
-
-	res, err := request.getRequest(url)
+	res, err := client.getRequest(url)
 	if err != nil {
 		return nil, err
 	}
@@ -201,16 +199,9 @@ func (request *APIRequest) getList() (data []byte, err error) {
 		return nil, err
 	}
 
-	if limitStr, exist := request.params.Query["limit"]; exist {
-		limit, err = strconv.Atoi(limitStr)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if responseData.Meta.Size > 1000 && limit > 1000 {
-		urlList := makeURLList(url, limit)
-		parallelResponse := request.parallelGet(urlList)
+	if responseData.Meta.Size > 1000 {
+		urlList := makeURLList(url, responseData.Meta.Size)
+		parallelResponse := client.parallelGet(urlList)
 
 		for _, response := range parallelResponse {
 			respData, err := getResponseData(response.Body)
@@ -244,19 +235,19 @@ func getRemaining(res *http.Response) (remaining int) {
 }
 
 // getRequest формирует запрос и возвращает тело ответа
-func (request *APIRequest) getRequest(url string) (body []byte, err error) {
+func (client *Client) getRequest(url string) (body []byte, err error) {
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	request.client.setHeaders(req)
-	request.client.requestChannel <- struct{}{}
+	client.api.setHeaders(req)
+	client.api.requestChannel <- struct{}{}
 
 	log.Printf("Requesting: GET %s\n", url)
 
-	res, err := request.client.httpClient.Do(req)
+	res, err := client.api.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -274,28 +265,30 @@ func (request *APIRequest) getRequest(url string) (body []byte, err error) {
 		if remaining <= 5 {
 			<-time.After(time.Second)
 		}
-		<-request.client.requestChannel
+		<-client.api.requestChannel
 	}()
 
 	return body, nil
 }
 
-// parallelGet выполняет  запросы, обрабатывает ответы и возвращает отсортированные результаты ответов
-func (request *APIRequest) parallelGet(urlList []string) (results []Response) {
+// parallelGet выполняет запросы, обрабатывает ответы и возвращает отсортированные результаты
+func (client *Client) parallelGet(urlList []string) (results []Response) {
 
 	for i, url := range urlList {
 		go func(i int, url string) {
-			response, err := request.getRequest(url)
+			response, err := client.getRequest(url)
 			if err != nil {
 				return
 			}
 
-			request.client.responseChannel <- &Response{i, response}
+			defer func(response []byte) {
+				client.api.responseChannel <- &Response{i, response}
+			}(response)
 		}(i, url)
 	}
 
 	for {
-		result := <-request.client.responseChannel
+		result := <-client.api.responseChannel
 		results = append(results, *result)
 
 		if len(results) == len(urlList) {

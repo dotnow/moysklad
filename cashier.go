@@ -11,16 +11,22 @@ type Cashier struct {
 	RetailStore *RetailStore `json:"retailStore,omitempty"` // Метаданные точки продаж, к которой прикреплен кассир
 }
 
-// CashierRequest структура для запросов сущности 'employee'
-type CashierRequest struct{ *APIRequest }
+// CashierClient структура для запросов сущности 'employee'
+type CashierClient struct{ *Client }
 
 // Cashier устанавливает нужный endpoint
-func (client *APIClient) Cashier(params Params) *CashierRequest {
-	return &CashierRequest{newRequest(client, "entity/cashier", params)}
+func (api *APIClient) Cashier(params Params) *CashierClient {
+	return &CashierClient{
+		&Client{
+			endPoint: "entity/cashier",
+			params:   params,
+			api:      api,
+		},
+	}
 }
 
 // GetByUUID возвращает сущность по UUID
-func (client *CashierRequest) GetByUUID(uuid string) (cashier *Cashier, err error) {
+func (client *CashierClient) GetByUUID(uuid string) (cashier *Cashier, err error) {
 
 	response, err := client.getByUUID(uuid)
 	if err != nil {
@@ -36,9 +42,9 @@ func (client *CashierRequest) GetByUUID(uuid string) (cashier *Cashier, err erro
 }
 
 // Get возвращает список сущностей
-func (client *CashierRequest) Get() (cashiers []Cashier, err error) {
+func (client *CashierClient) Get() (cashiers []Cashier, err error) {
 
-	response, err := client.getList()
+	response, err := client.all()
 	if err != nil {
 		return nil, err
 	}
