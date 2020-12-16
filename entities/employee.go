@@ -1,10 +1,8 @@
-package moysklad
-
-import "encoding/json"
+package entities
 
 // Employee Сотрудник
 type Employee struct {
-	Meta         *Meta       `json:"meta,omitempty"`         // Метаданные Сотрудника
+	Meta         *Meta       `json:"meta"`                   // Метаданные Сотрудника
 	ID           string      `json:"id,omitempty"`           // ID Сотрудника (Только для чтения)
 	AccountID    string      `json:"accountId,omitempty"`    // ID учетной записи (Только для чтения)
 	Owner        *Employee   `json:"owner,omitempty"`        // Владелец (Сотрудник)
@@ -29,50 +27,4 @@ type Employee struct {
 	Image        *Image      `json:"image,omitempty"`        // Фотография сотрудника
 	INN          string      `json:"inn,omitempty"`          // ИНН сотрудника (в формате ИНН физического лица)
 	Position     string      `json:"position,omitempty"`     // Должность сотрудника
-}
-
-// EmployeeClient структура для запросов сущности 'employee'
-type EmployeeClient struct{ *Client }
-
-// Employee устанавливает нужный endpoint
-func (api *APIClient) Employee(params Params) *EmployeeClient {
-	return &EmployeeClient{
-		&Client{
-			endPoint: "entity/employee",
-			params:   params,
-			api:      api,
-		},
-	}
-}
-
-// GetByUUID возвращает сущность по UUID
-func (client *EmployeeClient) GetByUUID(uuid string) (employee *Employee, err error) {
-
-	response, err := client.getByUUID(uuid)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &employee)
-	if err != nil {
-		return nil, err
-	}
-
-	return employee, nil
-}
-
-// Get возвращает список сущностей
-func (client *EmployeeClient) Get() (employees []Employee, err error) {
-
-	response, err := client.all()
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &employees)
-	if err != nil {
-		return nil, err
-	}
-
-	return employees, nil
 }

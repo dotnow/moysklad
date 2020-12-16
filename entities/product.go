@@ -1,48 +1,40 @@
-package moysklad
-
-import (
-	"encoding/json"
-)
+package entities
 
 // ProductEntity Товар
 type ProductEntity struct {
-	Meta          *Meta          `json:"meta"`                    // Метаданные Товара
-	ID            string         `json:"id"`                      // ID Товара (Только для чтения)
-	AccountID     string         `json:"accountId"`               // ID учетной записи (Только для чтения)
-	Owner         *Employee      `json:"owner"`                   // Метаданные владельца (Сотрудника)
-	Shared        bool           `json:"shared"`                  // Общий доступ
-	Group         *Group         `json:"group"`                   // Метаданные отдела сотрудника
-	SyncID        string         `json:"syncId,omitempty"`        // ID синхронизации
-	Updated       string         `json:"updated"`                 // Момент последнего обновления сущности (Только для чтения)
-	Name          string         `json:"name"`                    // Наименование Товара
-	Description   string         `json:"description,omitempty"`   // Описание Товара
-	Code          string         `json:"code,omitempty"`          // Код Товара
-	ExternalCode  string         `json:"externalCode"`            // Внешний код Товара
-	Archived      bool           `json:"archived"`                // Добавлен ли Товар в архив
-	PathName      string         `json:"pathName"`                // Наименование группы, в которую входит Товар (Только для чтения)
-	Vat           int            `json:"vat,omitempty"`           // НДС %
-	EffectiveVat  int            `json:"effectiveVat,omitempty"`  // Реальный НДС % (Только для чтения)
-	ProductFolder *ProductFolder `json:"productFolder,omitempty"` // Метаданные группы Товара
-	Uom           *Uom           `json:"uom,omitempty"`           // Единицы измерения
-	Images        struct {
-		Meta `json:"meta,omitempty"`
-	} `json:"images,omitempty"` // Изображения Комплекта
-	MinPrice   *Price       `json:"minPrice,omitempty"`   // Минимальная цена
-	SalePrices []SalePrices `json:"salePrices,omitempty"` // Цены продажи
-	BuyPrice   *BuyPrice    `json:"buyPrice,omitempty"`   // Закупочная цена
-	Supplier   struct {
-		Meta `json:"meta"`
-	} `json:"supplier,omitempty"` // Метаданные контрагента-поставщика
-	Attributes []Attribute `json:"attributes,omitempty"` // Коллекция доп. полей
-	Country    *Country    `json:"country,omitempty"`    // Метаданные Страны
-	Article    string      `json:"article,omitempty"`    // Артикул
-	Weight     int         `json:"weight,omitempty"`     // Вес
-	Volume     int         `json:"volume,omitempty"`     // Объем
-	Packs      []struct {
-		ID       string   `json:"id"`                 // ID упаковки товара (Только для чтения)
-		Uom      Uom      `json:"uom"`                // Метаданные единиц измерения
-		Quantity int      `json:"quantity"`           // Количество Товаров в упаковке данного вида
-		Barcodes []string `json:"barcodes,omitempty"` // Массив штрихкодов упаковок товаров
+	Meta          *Meta         `json:"meta"`                    // Метаданные Товара
+	ID            string        `json:"id"`                      // ID Товара (Только для чтения)
+	AccountID     string        `json:"accountId"`               // ID учетной записи (Только для чтения)
+	Owner         Employee      `json:"owner"`                   // Метаданные владельца (Сотрудника)
+	Shared        bool          `json:"shared"`                  // Общий доступ
+	Group         Group         `json:"group"`                   // Метаданные отдела сотрудника
+	SyncID        string        `json:"syncId,omitempty"`        // ID синхронизации
+	Updated       string        `json:"updated"`                 // Момент последнего обновления сущности (Только для чтения)
+	Name          string        `json:"name"`                    // Наименование Товара
+	Description   string        `json:"description,omitempty"`   // Описание Товара
+	Code          string        `json:"code,omitempty"`          // Код Товара
+	ExternalCode  string        `json:"externalCode"`            // Внешний код Товара
+	Archived      bool          `json:"archived"`                // Добавлен ли Товар в архив
+	PathName      string        `json:"pathName"`                // Наименование группы, в которую входит Товар (Только для чтения)
+	Vat           int           `json:"vat,omitempty"`           // НДС %
+	EffectiveVat  int           `json:"effectiveVat,omitempty"`  // Реальный НДС % (Только для чтения)
+	ProductFolder ProductFolder `json:"productFolder,omitempty"` // Метаданные группы Товара
+	Uom           Uom           `json:"uom,omitempty"`           // Единицы измерения
+	Images        Images        `json:"images,omitempty"`        // Изображения
+	MinPrice      Price         `json:"minPrice,omitempty"`      // Минимальная цена
+	SalePrices    []SalePrices  `json:"salePrices,omitempty"`    // Цены продажи
+	BuyPrice      BuyPrice      `json:"buyPrice,omitempty"`      // Закупочная цена
+	Supplier      CounterParty  `json:"supplier,omitempty"`      // Метаданные контрагента-поставщика
+	Attributes    []Attribute   `json:"attributes,omitempty"`    // Коллекция доп. полей
+	Country       Country       `json:"country,omitempty"`       // Метаданные Страны
+	Article       string        `json:"article,omitempty"`       // Артикул
+	Weight        float64       `json:"weight,omitempty"`        // Вес
+	Volume        float64       `json:"volume,omitempty"`        // Объем
+	Packs         []struct {
+		ID       string    `json:"id"`                 // ID упаковки товара (Только для чтения)
+		Uom      Uom       `json:"uom"`                // Метаданные единиц измерения
+		Quantity int       `json:"quantity"`           // Количество Товаров в упаковке данного вида
+		Barcodes []Barcode `json:"barcodes,omitempty"` // Массив штрихкодов упаковок товаров
 	} `json:"packs,omitempty"` // Упаковки Товара
 	Alcoholic struct {
 		Excise   bool    `json:"excise,omitempty"`   // Содержит акцизную марку
@@ -51,7 +43,7 @@ type ProductEntity struct {
 		Volume   float64 `json:"volume,omitempty"`   // Объём тары
 	} `json:"alcoholic,omitempty"` // Объект, содержащий поля алкогольной продукции
 	VariantsCount      int       `json:"variantsCount"`               // Количество модификаций у данного товара (Только для чтения)
-	MinimumBalance     int       `json:"minimumBalance"`              // Неснижаемый остаток
+	MinimumBalance     float64   `json:"minimumBalance"`              // Неснижаемый остаток
 	IsSerialTrackable  bool      `json:"isSerialTrackable,omitempty"` // Учет по серийным номерам. Не может быть указан вместе с alcoholic и weighed
 	Things             []string  `json:"things,omitempty"`            // Серийные номера
 	Barcodes           []Barcode `json:"barcodes,omitempty"`          // Штрихкоды
@@ -149,48 +141,10 @@ type ProductEntity struct {
 	} `json:"files,omitempty"` // Массив метаданных Файлов (Максимальное количество файлов - 100)
 }
 
-// ProductClient структура для запросов сущности 'product'
-type ProductClient struct{ *Client }
+// Products срез объектов
+type Products []ProductEntity
 
-// Product устанавливает нужный endpoint
-func (api *APIClient) Product(params Params) *ProductClient {
-	return &ProductClient{
-		&Client{
-			endPoint: "entity/product",
-			params:   params,
-			api:      api,
-		},
-	}
-}
-
-// GetByUUID возвращает сущность по UUID
-func (client *ProductClient) GetByUUID(uuid string) (product *ProductEntity, err error) {
-
-	response, err := client.getByUUID(uuid)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &product)
-	if err != nil {
-		return nil, err
-	}
-
-	return product, nil
-}
-
-// Get возвращает список сущностей
-func (client *ProductClient) Get() (products []ProductEntity, err error) {
-
-	response, err := client.all()
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &products)
-	if err != nil {
-		return nil, err
-	}
-
-	return products, nil
+// Size возвращает общее количество объектов
+func (products Products) Size() int {
+	return len(products)
 }

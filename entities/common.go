@@ -1,4 +1,4 @@
-package moysklad
+package entities
 
 // Meta - Метаданные сущности
 type Meta struct {
@@ -50,13 +50,19 @@ type Group struct {
 
 // Image структура изображения (image)
 type Image struct {
-	Meta      *Meta  `json:"meta,omitempty"`      // Метаданные объекта
+	Meta      *Meta  `json:"meta"`                // Метаданные объекта
 	Title     string `json:"title,omitempty"`     // Название Изображения
 	Filename  string `json:"filename,omitempty"`  // Имя файла
 	Size      int    `json:"size,omitempty"`      // Размер файла в байтах
 	Updated   string `json:"updated,omitempty"`   // Время последнего изменения
 	Miniature Meta   `json:"miniature,omitempty"` // Метаданные миниатюры изображения
 	Tiny      Meta   `json:"tiny,omitempty"`      // Метаданные уменьшенного изображения
+}
+
+// Images ...
+type Images struct {
+	Meta *Meta   `json:"meta"`
+	Rows []Image `json:"rows,omitempty"`
 }
 
 // SalePrices Цена продажи
@@ -150,6 +156,7 @@ type Barcode struct {
 	EAN8    string `json:"ean8,omitempty"`    // штрихкод в формате EAN8, если требуется создать штрихкод в формате EAN8
 	Code128 string `json:"code128,omitempty"` // штрихкод в формате Code128, если требуется создать штрихкод в формате Code128
 	GTIN    string `json:"gtin,omitempty"`    // штрихкод в формате GTIN, если требуется создать штрихкод в формате GTIN. Валидируется на соответствие формату GS1
+	UPC     string `json:"upc,omitempty"`     // штрихкод в формате UPC, если требуется создать штрихкод в формате UPC.
 }
 
 // File Файл

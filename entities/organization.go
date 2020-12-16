@@ -1,6 +1,4 @@
-package moysklad
-
-import "encoding/json"
+package entities
 
 // Organization структура сущности Юрлицо
 type Organization struct {
@@ -59,6 +57,7 @@ type Organization struct {
 
 // Account Счета юрлица
 type Account struct {
+	Meta                 *Meta         `json:"meta,omitempty"`
 	ID                   string        `json:"id,omitempty"`                   // ID Счета (Только для чтения)
 	AccountID            string        `json:"accountId,omitempty"`            // ID учетной записи (Только для чтения)
 	Updated              string        `json:"updated,omitempty"`              // Момент последнего обновления юрлица (Только для чтения)
@@ -71,48 +70,8 @@ type Account struct {
 	Agent                *Organization `json:"agent,omitempty"`                // Метаданные юрлица
 }
 
-// OrganizationClient структура для запросов сущности 'employee'
-type OrganizationClient struct{ *Client }
-
-// Organization устанавливает нужный endpoint
-func (api *APIClient) Organization(params Params) *OrganizationClient {
-	return &OrganizationClient{
-		&Client{
-			endPoint: "entity/organization",
-			params:   params,
-			api:      api,
-		},
-	}
-}
-
-// GetByUUID возвращает сущность по UUID
-func (client *OrganizationClient) GetByUUID(uuid string) (organization *Organization, err error) {
-
-	response, err := client.getByUUID(uuid)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &organization)
-	if err != nil {
-		return nil, err
-	}
-
-	return organization, nil
-}
-
-// Get возвращает список сущностей
-func (client *OrganizationClient) Get() (organizations []Organization, err error) {
-
-	response, err := client.all()
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &organizations)
-	if err != nil {
-		return nil, err
-	}
-
-	return organizations, nil
+// Accounts ...
+type Accounts struct {
+	Meta *Meta     `json:"meta,omitempty"`
+	Rows []Account `json:"rows,omitempty"`
 }

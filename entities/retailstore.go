@@ -1,6 +1,4 @@
-package moysklad
-
-import "encoding/json"
+package entities
 
 // RetailStore Точка продаж
 type RetailStore struct {
@@ -136,51 +134,4 @@ type RetailStore struct {
 	// CHOSEN	Выбранные кассы из списка в поле masterRetailStores
 	// --
 	MasterRetailStores []*RetailStore `json:"masterRetailStores,omitempty"` // Ссылка на точки продаж, которые могут фискализировать операции с текущей точки продаж, если minionToMaster = CHOSEN
-}
-
-// RetailstoreClient структура для запросов сущности 'retailstore'
-type RetailstoreClient struct{ *Client }
-
-// Retailstore устанавливает нужный endpoint
-func (api *APIClient) Retailstore(params Params) *RetailstoreClient {
-	return &RetailstoreClient{
-		&Client{
-
-			endPoint: "entity/retailstore",
-			params:   params,
-			api:      api,
-		},
-	}
-}
-
-// GetByUUID возвращает сущность по UUID
-func (client *RetailstoreClient) GetByUUID(uuid string) (retailstore *RetailStore, err error) {
-
-	response, err := client.getByUUID(uuid)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &retailstore)
-	if err != nil {
-		return nil, err
-	}
-
-	return retailstore, nil
-}
-
-// Get возвращает список сущностей
-func (client *RetailstoreClient) Get() (retailstores []RetailStore, err error) {
-
-	response, err := client.all()
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(response, &retailstores)
-	if err != nil {
-		return nil, err
-	}
-
-	return retailstores, nil
 }

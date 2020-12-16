@@ -1,4 +1,4 @@
-package moysklad
+package entities
 
 // Price Цена
 type Price struct {

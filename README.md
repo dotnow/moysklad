@@ -2,19 +2,35 @@
 
 # moysklad
 
-Библиотека для работы с [JSON API Moysklad](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api), написанная на Go
+Модуль для работы с [JSON API Moysklad](https://dev.moysklad.ru/doc/api/remap/1.2/#mojsklad-json-api), написанная на Golang
 
 > **Внимание!** Библиотека находится в стадии разработки
+
+## Установка
+
+```
+go get -u github.com/dotnow/moysklad
+```
 
 ## Пример использования
 
 ```go
-ms := NewClient(API_TOKEN)
+...
 
-params := Params{Query: map[string]string{
-	"limit": "10",
-}}
+ms := Moysklad(API_TOKEN)
+
+params := client.Params{}
+params.AddQuery("limit", "10")
 
 // Получаем срез сущностей Товар
-response, err := ms.Product(params).Get()
+products, err := ms.Product(params).GetList()
+if err != nil {
+	log.Fatal(err)
+}
+
+for index, element := range products {
+	fmt.Printf("%d. %s\n", index+1, element.Name)
+}
+
+...
 ```

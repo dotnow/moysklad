@@ -1,4 +1,4 @@
-package moysklad
+package entities
 
 // Variant Модификация
 type Variant struct {
@@ -12,8 +12,8 @@ type Variant struct {
 	ExternalCode    string           `json:"externalCode,omitempty"`
 	Archived        bool             `json:"archived,omitempty"`
 	Characteristics *Characteristics `json:"characteristics,omitempty"`
-	SalePrices      *SalePrices      `json:"salePrices,omitempty"`
-	Barcodes        []string         `json:"barcodes,omitempty"`
+	SalePrices      []SalePrices     `json:"salePrices,omitempty"` // Цены продажи
+	Barcodes        []Barcode        `json:"barcodes,omitempty"`   // Штрихкоды
 	Product         *ProductEntity   `json:"product,omitempty"`
 	Stock           int              `json:"stock,omitempty"`
 	Reserve         int              `json:"reserve,omitempty"`

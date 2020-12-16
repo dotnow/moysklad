@@ -1,3 +1,3 @@
-module github.com/yrle/moysklad
+module github.com/dotnow/moysklad
 
 go 1.15

@@ -1,9 +1,9 @@
-package moysklad
+package entities
 
 // Service Услуга
 type Service struct {
-	Meta               *Meta          `json:"meta,omitempty"`               // Метаданные Услуги
-	ID                 string         `json:"id,omitempty"`                 // ID Услуги (Только для чтения)
+	Meta               *Meta          `json:"meta"`                         // Метаданные Услуги
+	ID                 string         `json:"id"`                           // ID Услуги (Только для чтения)
 	AccountID          string         `json:"accountId,omitempty"`          // ID учетной записи (Только для чтения)
 	Owner              *Employee      `json:"owner,omitempty"`              // Метаданные владельца (Сотрудника)
 	Shared             bool           `json:"shared,omitempty"`             // Общий доступ
@@ -20,11 +20,11 @@ type Service struct {
 	EffectiveVat       int            `json:"effectiveVat,omitempty"`       // Реальный НДС % (Только для чтения)
 	ProductFolder      *ProductFolder `json:"productFolder,omitempty"`      //	Метаданные группы
 	Uom                *Uom           `json:"uom,omitempty"`                // Единицы измерения
-	MinPrice           float64        `json:"minPrice,omitempty"`           // Минимальная цена
+	MinPrice           *Price         `json:"minPrice,omitempty"`           // Минимальная цена
 	SalePrices         []SalePrices   `json:"salePrices,omitempty"`         // Цены продажи
 	BuyPrice           *BuyPrice      `json:"buyPrice,omitempty"`           // Закупочная продажи
 	Attributes         []Attribute    `json:"attributes,omitempty"`         // Коллекция доп. полей
-	Barcodes           []Barcode      `json:"barcodes,omitempty"`           // Штрихкоды Комплекта
+	Barcodes           []Barcode      `json:"barcodes,omitempty"`           // Штрихкоды
 	DiscountProhibited bool           `json:"discountProhibited,omitempty"` // Признак запрета скидок
 	PaymentItemType    string         `json:"paymentItemType,omitempty"`    // Признак предмета расчета
 
