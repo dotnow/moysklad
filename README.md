@@ -17,7 +17,7 @@ go get -u github.com/dotnow/moysklad
 ```go
 ...
 
-ms := Moysklad(API_TOKEN)
+ms := moysklad.Moysklad(API_TOKEN)
 
 params := client.Params{}
 params.AddQuery("limit", "10")
